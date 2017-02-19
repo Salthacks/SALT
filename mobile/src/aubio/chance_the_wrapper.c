@@ -17,7 +17,7 @@ Java_com_salthacks_salt_MainActivity_processAubio(JNIEnv *env, jobject instance,
 
 	if (!tempo) {
 		printf("tempo was NULL");
-		return;
+		return 0;
 	}
 
     fvec_t *in = new_fvec(HOPSIZE);

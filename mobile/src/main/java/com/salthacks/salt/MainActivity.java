@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements
         DataApi.DataListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
+
     static {
         System.loadLibrary("aubio-lib");
     }
@@ -43,10 +44,9 @@ public class MainActivity extends AppCompatActivity implements
     private static final int AUBIO_HOPSIZE = 1024/4;
     private static final int RECORDER_SAMPLERATE = 44100;
     private static final int RECORDER_SAMPLESECS = 2;
+    private static final int ITERATION_LIMIT = 10000;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_FLOAT;
-
-    private GoogleApiClient mGoogleApiClient;
 
     // derived constants
     private static final int RECODER_BUFSIZE = RECORDER_SAMPLERATE * RECORDER_SAMPLESECS;
@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements
     private AudioRecord recorder = null;
     private Thread recordingThread = null;
     private boolean isRecording = false;
+    private GoogleApiClient mGoogleApiClient;
+    private double period_average = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -121,15 +123,23 @@ public class MainActivity extends AppCompatActivity implements
 
 
         float sData[] = new float[RECODER_BUFSIZE];
+        double count = 0;
+        double total = 0;
+
 
         while (isRecording) {
             // gets the voice output from microphone to byte format
-
+            if (count > ITERATION_LIMIT)
+            {
+                total = 0;
+                count = 0;
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 recorder.read(sData, 0, RECODER_BUFSIZE, AudioRecord.READ_BLOCKING);
-
-                double lolKotes = processAubio(AUBIO_INSIZE, AUBIO_HOPSIZE, RECORDER_SAMPLERATE, sData);
-                
+                ++count;
+                total += processAubio(AUBIO_INSIZE, AUBIO_HOPSIZE, RECORDER_SAMPLERATE, sData);
+                period_average = total / count;
+                //storeData(period_average*1000);
             }
         }
 
@@ -143,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements
             recorder.release();
             recorder = null;
             recordingThread = null;
+            period_average = 0;
         }
     }
 

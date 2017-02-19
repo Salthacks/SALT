@@ -28,6 +28,7 @@ import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataItemBuffer;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 
@@ -109,6 +110,8 @@ public class MainActivity extends WearableActivity implements DataApi.DataListen
                 .addOnConnectionFailedListener(this)
                 .build();
 
+        mGoogleApiClient.connect();
+
 
     }
 
@@ -145,23 +148,6 @@ public class MainActivity extends WearableActivity implements DataApi.DataListen
     }
 
     private void trackBPM(){
-        PendingResult<DataItemBuffer> results = Wearable.DataApi.getDataItems(mGoogleApiClient);
-        results.setResultCallback(new ResultCallback<DataItemBuffer>() {
-            @Override
-            public void onResult(DataItemBuffer dataItems) {
-                if (dataItems.getCount() != 0) {
-                    DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItems.get(0));
-
-                    // This should read the correct value.
-                    interval = (long)dataMapItem.getDataMap().getDouble("BPM");
-                    mTextView.setText(Long.toString(interval));
-                    mTextView.setTextColor(Color.WHITE);
-                    Log.d("DAKOTA DEBUG", "INTERVAL RETRIEVED: " + Long.toString(interval));
-                }
-
-                dataItems.release();
-            }
-        });
 
         /*
         if(presses < 8) {
@@ -260,8 +246,14 @@ public class MainActivity extends WearableActivity implements DataApi.DataListen
             if (event.getType() == DataEvent.TYPE_CHANGED) {
                 // DataItem changed
                 DataItem item = event.getDataItem();
-                item.getData();
-
+                if (item.getUri().getPath().compareTo("/bpm") == 0) {
+                    DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                    interval = (long) dataMap.getDouble("BPM");
+                    mTextView.setText(Long.toString(interval));
+                    mTextView.setTextColor(Color.WHITE);
+                    Log.d("DAKOTA DEBUG", "INTERVAL RETRIEVED: " + Long.toString(interval));
+                    trackBPM();
+                }
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
                 // DataItem deleted
             }

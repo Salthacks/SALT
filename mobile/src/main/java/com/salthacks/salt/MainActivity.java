@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onStart();
         enableButtons(true);
         startRecording();
+        mGoogleApiClient.connect();
     }
 
     @Override
@@ -176,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements
                 case R.id.btnStart: {
                     enableButtons(true);
                     startRecording();
+                    storeData(50);
                     break;
                 }
                 case R.id.btnStop: {
@@ -228,7 +230,6 @@ public class MainActivity extends AppCompatActivity implements
         PutDataMapRequest dataMap = PutDataMapRequest.create("/bpm");
         dataMap.getDataMap().putDouble("BPM",millis);
         PutDataRequest request = dataMap.asPutDataRequest();
-        PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi
-                .putDataItem(mGoogleApiClient, request);
+        Wearable.DataApi.putDataItem(mGoogleApiClient, request);
     }
 }

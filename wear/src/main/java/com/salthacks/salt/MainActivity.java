@@ -195,7 +195,7 @@ public class MainActivity extends WearableActivity implements DataApi.DataListen
             vibrator.vibrate(intervalPattern,0);
         }else {
             long intervalPattern[] = new long[2];
-            intervalPattern[0] = interval - 185;
+            intervalPattern[0] = interval - 150;
             intervalPattern[1] = 250;
             vibrator.vibrate(intervalPattern, 0);
 
@@ -248,7 +248,10 @@ public class MainActivity extends WearableActivity implements DataApi.DataListen
                 DataItem item = event.getDataItem();
                 if (item.getUri().getPath().compareTo("/bpm") == 0) {
                     DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-                    interval = (long) dataMap.getDouble("BPM");
+
+                    double temp =  dataMap.getDouble("BPM");
+                    Log.d("DAKOTA DEBUG", "INTERVAL BPM RETRIEVED: " + Double.toString(temp));
+                    interval = (long) (1/((temp/(double)60)/(double)1000));
                     mTextView.setText(Long.toString(interval));
                     mTextView.setTextColor(Color.WHITE);
                     Log.d("DAKOTA DEBUG", "INTERVAL RETRIEVED: " + Long.toString(interval));

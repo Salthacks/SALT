@@ -43,8 +43,8 @@ public class MainActivity extends AppCompatActivity implements
     private static final int AUBIO_INSIZE = 1024;
     private static final int AUBIO_HOPSIZE = 1024/4;
     private static final int RECORDER_SAMPLERATE = 44100;
-    private static final int RECORDER_SAMPLESECS = 2;
-    private static final int ITERATION_LIMIT = 90;
+    private static final int RECORDER_SAMPLESECS = 10;
+    private static final int ITERATION_LIMIT = 1;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_FLOAT;
 
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements
     private Thread recordingThread = null;
     private boolean isRecording = false;
     private GoogleApiClient mGoogleApiClient;
-    private double period_average = 0;
+    private double average = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -152,8 +152,8 @@ public class MainActivity extends AppCompatActivity implements
                 recorder.read(sData, 0, RECODER_BUFSIZE, AudioRecord.READ_BLOCKING);
                 ++count;
                 total += processAubio(AUBIO_INSIZE, AUBIO_HOPSIZE, RECORDER_SAMPLERATE, sData);
-                period_average = total / count;
-                storeData(period_average*1000);
+                average = total / count;
+                storeData(average);
             }
         }
 
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements
             recorder.release();
             recorder = null;
             recordingThread = null;
-            period_average = 0;
+            average = 0;
         }
     }
 

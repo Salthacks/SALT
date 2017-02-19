@@ -45,6 +45,6 @@ Java_com_salthacks_salt_MainActivity_processAubio(JNIEnv *env, jobject instance,
     del_fvec(out);
     del_fvec(in);
 
-    return period;
+    return bpm;
 }
 

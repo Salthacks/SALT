@@ -77,6 +77,18 @@ public class MainActivity extends AppCompatActivity implements
         Log.d("MAXWELL DEBUG", "Curr Buffer Size: " + RECODER_BUFSIZE);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        startRecording();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopRecording();
+    }
+
     private void setButtonHandlers() {
         ((Button) findViewById(R.id.btnStart)).setOnClickListener(btnClick);
         ((Button) findViewById(R.id.btnStop)).setOnClickListener(btnClick);

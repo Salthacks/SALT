@@ -224,6 +224,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void storeData(double millis){
+        Log.d("DAKOTA DEBUG", "MILLIS ENTERED: " + Double.toString(millis));
         PutDataMapRequest dataMap = PutDataMapRequest.create("/bpm");
         dataMap.getDataMap().putDouble("BPM",millis);
         PutDataRequest request = dataMap.asPutDataRequest();

@@ -103,7 +103,11 @@ public class MainActivity extends WearableActivity implements DataApi.DataListen
             }
         });
         vibrator =  (Vibrator) getSystemService(VIBRATOR_SERVICE);
-
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
 
 
     }
@@ -150,6 +154,9 @@ public class MainActivity extends WearableActivity implements DataApi.DataListen
 
                     // This should read the correct value.
                     interval = (long)dataMapItem.getDataMap().getDouble("BPM");
+                    mTextView.setText(Long.toString(interval));
+                    mTextView.setTextColor(Color.WHITE);
+                    Log.d("DAKOTA DEBUG", "INTERVAL RETRIEVED: " + Long.toString(interval));
                 }
 
                 dataItems.release();

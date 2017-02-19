@@ -27,6 +27,11 @@
 #ifndef AUBIO_PRIV_H
 #define AUBIO_PRIV_H
 
+#define NULL 0
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+
 /*********************
  *
  * External includes

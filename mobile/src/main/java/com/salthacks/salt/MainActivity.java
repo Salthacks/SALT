@@ -10,6 +10,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
+    static {
+        System.loadLibrary("aubio-lib");
+    }
+
+    public native void plzWerk();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

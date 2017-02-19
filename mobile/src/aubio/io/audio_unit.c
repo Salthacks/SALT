@@ -156,7 +156,7 @@ sint_t aubio_audio_unit_init (aubio_audio_unit_t *o)
   o->au_ios_cb_struct.inputProcRefCon = o;
 
   /* setting up audio session with interruption listener */
-  err = AudioSessionInitialize(NULL, NULL, audio_unit_interruption_listener, o);
+  err = AudioSessionInitialize(0, 0, audio_unit_interruption_listener, o);
   if (err) { AUBIO_ERR("audio_unit: could not initialize audio session (%d)\n", (int)err); goto fail; }
 
   audio_unit_set_audio_session_category(o->input_enabled, o->verbose);

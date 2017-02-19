@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:src="@drawable/hearticon"
+        android:src="@drawable/heart_icon"
         android:background="@null"
         app:layout_box="all"
         android:layout_centerVertical="true"

@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     public native void processAubio(int hopSize, int sampleRate, float in[]);
 
 
-    private static final int RECORDER_SAMPLERATE = 8000;
+    private static final int RECORDER_SAMPLERATE = 44100;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     private AudioRecord recorder = null;

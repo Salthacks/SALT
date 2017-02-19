@@ -1,1 +1,1 @@
-include ':mobile', ':wear'
+include ':mobile', ':wear', ':progress-fab', ':circular_fab'

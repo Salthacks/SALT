@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
@@ -18,16 +17,25 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="17dp" />
 
-    <ImageButton
-        android:id="@+id/button"
+    <com.dmitrymalkovich.android.ProgressFloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@drawable/heart_icon"
-        android:background="@null"
-        app:layout_box="all"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_margin="@circular_fab/src/main/res/values/dimens.xml"
+        android:clickable="true"
+        android:id="@+id/button">
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@circular_fab/src/main/res/drawable/ic_backup_black_24dp.xml" />
+
+        <ProgressBar
+            style="@circular_fab/src/main/res/style/Widget.AppCompat.ProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </com.dmitrymalkovich.android.ProgressFloatingActionButton>
+
 
     <TextView
         android:text="@string/tap_message"
@@ -39,16 +47,6 @@
         android:layout_marginBottom="26dp"
         android:id="@+id/textView2" />
 
-    <Button
-        android:text="X"
-        android:textColor="#FFF"
-        android:background="@drawable/round_button_background"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:id="@+id/button2"
-        android:layout_marginBottom="15dp"
-        android:layout_alignBottom="@+id/button_presses"
-        android:layout_alignEnd="@+id/textView2" />
 
     <TextView
         android:text="Salsa!"
@@ -68,6 +66,16 @@
 
         android:layout_alignBottom="@+id/textView"
         android:layout_toStartOf="@+id/button_presses" />
+
+    <Button
+        android:text="X"
+        android:textColor="#FFF"
+        android:background="@drawable/round_button_background"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/button2"
+        android:layout_below="@+id/button"
+        android:layout_alignRight="@+id/textView2" />
 
 
 </RelativeLayout>

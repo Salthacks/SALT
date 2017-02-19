@@ -122,4 +122,8 @@ public class MainActivity extends WearableActivity {
         intervalPattern[1] = 250;
         vibrator.vibrate(intervalPattern,0);
     }
+
+    private void captureAudio(){
+
+    }
 }

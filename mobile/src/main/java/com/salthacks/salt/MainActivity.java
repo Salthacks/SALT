@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final int AUBIO_HOPSIZE = 1024/4;
     private static final int RECORDER_SAMPLERATE = 44100;
     private static final int RECORDER_SAMPLESECS = 2;
-    private static final int ITERATION_LIMIT = 10000;
+    private static final int ITERATION_LIMIT = 90;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_FLOAT;
 
@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
+        enableButtons(true);
         startRecording();
     }
 

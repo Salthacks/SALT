@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <android/log.h>
 
-JNIEXPORT jfloat JNICALL
+JNIEXPORT jdouble JNICALL
 Java_com_salthacks_salt_MainActivity_processAubio(JNIEnv *env, jobject instance, jint in_size, jint hop_size, jint sample_rate, jfloatArray jIn) {
 
     const uint_t HOPSIZE = (uint_t) hop_size;
@@ -45,6 +45,6 @@ Java_com_salthacks_salt_MainActivity_processAubio(JNIEnv *env, jobject instance,
     del_fvec(out);
     del_fvec(in);
 
-    return (jfloat) period;
+    return period;
 }
 

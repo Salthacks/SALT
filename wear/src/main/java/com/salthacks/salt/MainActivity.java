@@ -252,7 +252,7 @@ public class MainActivity extends WearableActivity implements DataApi.DataListen
                     mTextView.setText(Long.toString(interval));
                     mTextView.setTextColor(Color.WHITE);
                     Log.d("DAKOTA DEBUG", "INTERVAL RETRIEVED: " + Long.toString(interval));
-                    trackBPM();
+                    //trackBPM();
                 }
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
                 // DataItem deleted

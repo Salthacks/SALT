@@ -6,11 +6,15 @@ import android.os.Vibrator;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,29 +31,56 @@ public class MainActivity extends WearableActivity {
 
     private Vibrator vibrator;
 
-    private ImageButton button;
+    private ImageButton button1;
+    private Button button2;
+    private Switch button3;
 
     private int presses;
     private long pressTimes[];
 
     private long interval;
 
+    private boolean salsa;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setAmbientEnabled();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         pressTimes = new long[8];
         presses = 0;
+        salsa = false;
         mContainerView = (RelativeLayout) findViewById(R.id.container);
         mTextView = (TextView) mContainerView.findViewById(R.id.button_presses);
         mTextView.setText(Integer.toString(8-presses));
         mTextView.setTextColor(Color.WHITE);
-        button = (ImageButton) mContainerView.findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
+        button1 = (ImageButton) mContainerView.findViewById(R.id.button);
+        button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 trackBPM();
+            }
+        });
+        button2 = (Button) mContainerView.findViewById(R.id.button2);
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelVibrate();
+            }
+        });
+        button3 = (Switch) mContainerView.findViewById(R.id.button3);
+        button3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // The toggle is enabled
+                    salsa = true;
+                    setVibrateInterval();
+                } else {
+                    salsa =false;
+                    setVibrateInterval();
+                    // The toggle is disabled
+                }
             }
         });
         vibrator =  (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -94,7 +125,7 @@ public class MainActivity extends WearableActivity {
             ++presses;
             mTextView.setText(Integer.toString(8-presses));
             mTextView.setTextColor(Color.WHITE);
-            vibrator.vibrate(250);
+            //vibrator.vibrate(250);
             if(presses > 7){
                 calculateAverage();
             }
@@ -112,14 +143,55 @@ public class MainActivity extends WearableActivity {
             sum += (pressTimes[i+1] - pressTimes[i]);
         }
         interval = sum/8;
-
+        mTextView.setText("Beating!");
+        mTextView.setTextColor(Color.WHITE);
         setVibrateInterval();
     }
 
     private void setVibrateInterval(){
-        long intervalPattern[] = new long[2];
-        intervalPattern[0] = interval-250;
+        if(salsa){
+            long intervalPattern[] = new long[8];
+            intervalPattern[0] = interval - 185;
+            intervalPattern[1] = 250;
+            intervalPattern[2] = interval - 185;
+            intervalPattern[3] = 250;
+            intervalPattern[4] = interval - 185;
+            intervalPattern[5] = 250;
+            intervalPattern[6] = interval - 185 + 250;
+            intervalPattern[7] = 0;
+
+            vibrator.vibrate(intervalPattern,0);
+        }else {
+            long intervalPattern[] = new long[2];
+            intervalPattern[0] = interval - 185;
+            intervalPattern[1] = 250;
+            vibrator.vibrate(intervalPattern, 0);
+
+        }
+    }
+    /*
+    private void setSalsaBeat(){
+        salsa = true;
+        long intervalPattern[] = new long[8];
+        intervalPattern[0] = interval - 185;
         intervalPattern[1] = 250;
+        intervalPattern[2] = interval - 185;
+        intervalPattern[3] = 250;
+        intervalPattern[4] = interval - 185;
+        intervalPattern[5] = 250;
+        intervalPattern[6] = interval - 185 + 250;
+        intervalPattern[7] = 0;
+
         vibrator.vibrate(intervalPattern,0);
+
+    }
+    */
+    private void cancelVibrate(){
+        salsa = false;
+        button3.setChecked(false);
+        presses = 0;
+        mTextView.setText(Integer.toString(8-presses));
+        mTextView.setTextColor(Color.WHITE);
+        vibrator.cancel();
     }
 }

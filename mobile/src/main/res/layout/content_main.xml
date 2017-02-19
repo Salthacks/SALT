@@ -13,8 +13,28 @@
     tools:context="com.salthacks.salt.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/center"
+        />
+
+    <Button
+        android:text="Start Recording"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:layout_above="@+id/center"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        android:id="@+id/btnStart" />
+    <Button
+        android:text="Stop Recording"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/center"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        android:id="@+id/btnStop" />
 </RelativeLayout>

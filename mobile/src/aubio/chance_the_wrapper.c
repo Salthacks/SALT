@@ -1,38 +1,50 @@
 #include "aubio.h"
 #include <jni.h>
 #include <stdio.h>
-#include "fvec.h"
 #include <stdlib.h>
+#include <android/log.h>
 
+JNIEXPORT jfloat JNICALL
+Java_com_salthacks_salt_MainActivity_processAubio(JNIEnv *env, jobject instance, jint in_size, jint hop_size, jint sample_rate, jfloatArray jIn) {
 
-JNIEXPORT void JNICALL
-Java_com_salthacks_salt_MainActivity_processAubio(JNIEnv *env, jobject instance, jint hop_size, jint sample_rate, jfloatArray jIn) {
+    const uint_t HOPSIZE = (uint_t) hop_size;
+    const uint_t INSIZE = (uint_t) in_size;
 
 	jsize jLen = (*env)->GetArrayLength(env, jIn);
-	fvec_t *in = malloc(sizeof(fvec_t));
-	in->length = jLen;
-	jfloat *jInData = (*env)->GetFloatArrayElements(env, jIn, 0);
-	in->data = jInData;
+	jfloat * const jInData = (*env)->GetFloatArrayElements(env, jIn, 0);
 
-	aubio_tempo_t* tempo = new_aubio_tempo("default", (int)jLen, (int)hop_size, (int)sample_rate);
+    aubio_tempo_t* tempo = new_aubio_tempo("default", INSIZE, HOPSIZE, (uint_t)sample_rate);
+
 	if (!tempo) {
 		printf("tempo was NULL");
 		return;
 	}
 
-	// The god function!!!! 🙏
-	fvec_t *out = malloc(sizeof(fvec_t));
-	out->length = jLen;
-	out->data = malloc(sizeof(float) * jLen);
-	aubio_tempo_do (tempo, in, out);
+    fvec_t *in = new_fvec(HOPSIZE);
+    fvec_t *out = new_fvec(1);
 
-	for (int i=0; i!=jLen; ++i) {
-		printf("%f ", out->data[i]);
-	}
+    uint_t copyI = 0;
+    uint64_t bpmSum = 0;
+    uint_t ticksSinceLastBeat = 0;
+    double periodSum = 0;
+
+    while ((copyI + hop_size) < jLen) {
+        for (int i = 0; i != HOPSIZE; ++i) {
+            in->data[i] = jInData[copyI++];
+        }
+        aubio_tempo_do (tempo, in, out);
+        bpmSum += aubio_tempo_get_bpm(tempo);
+        periodSum += aubio_tempo_get_period_s(tempo);
+    }
+    uint_t numIterations = (copyI/hop_size);
+    float bpm = bpmSum / (double)numIterations;
+    double period = periodSum / (double)numIterations;
 
 	del_aubio_tempo (tempo);
 	(*env)->ReleaseFloatArrayElements(env, jIn, jInData, 0);
-	free(in);
-	free(out->data);
-	free(out);
+    del_fvec(out);
+    del_fvec(in);
+
+    return (jfloat) period;
 }
+

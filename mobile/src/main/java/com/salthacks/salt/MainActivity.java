@@ -16,12 +16,14 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("aubio-lib");
     }
 
-    public native void processAubio(int hopSize, int sampleRate, float in[]);
+    public native double processAubio(int inSize, int hopSize, int sampleRate, float in[]);
 
 
     // fiddable constants
+    private static final int AUBIO_INSIZE = 1024;
+    private static final int AUBIO_HOPSIZE = 1024/4;
     private static final int RECORDER_SAMPLERATE = 44100;
-    private static final int RECORDER_SAMPLESECS = 5;
+    private static final int RECORDER_SAMPLESECS = 2;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_FLOAT;
 
@@ -98,12 +100,9 @@ public class MainActivity extends AppCompatActivity {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 recorder.read(sData, 0, RECODER_BUFSIZE, AudioRecord.READ_BLOCKING);
-                for (int i = 0; i != sData.length; ++i) {
-                    if (sData[i] != 0) {
-                        Log.d("MAXWELL DEBUG", "sData[: " + i + "] = " + sData[i]);
-                    }
-                }
-                processAubio(RECODER_BUFSIZE/8, RECORDER_SAMPLERATE, sData);
+
+                double lolKotes = processAubio(AUBIO_INSIZE, AUBIO_HOPSIZE, RECORDER_SAMPLERATE, sData);
+                
             }
         }
 

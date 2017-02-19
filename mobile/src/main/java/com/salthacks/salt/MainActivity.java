@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("aubio-lib");
     }
 
-    public native void plzWerk();
+    public native void processAubio(int hopSize, int sampleRate, float in[]);
 
 
     @Override

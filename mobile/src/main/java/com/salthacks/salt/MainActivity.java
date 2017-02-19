@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements
                 ++count;
                 total += processAubio(AUBIO_INSIZE, AUBIO_HOPSIZE, RECORDER_SAMPLERATE, sData);
                 period_average = total / count;
-                //storeData(period_average*1000);
+                storeData(period_average*1000);
             }
         }
 

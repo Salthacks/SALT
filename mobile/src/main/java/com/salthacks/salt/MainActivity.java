@@ -5,21 +5,11 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     static {
@@ -29,9 +19,16 @@ public class MainActivity extends AppCompatActivity {
     public native void processAubio(int hopSize, int sampleRate, float in[]);
 
 
+    // fiddable constants
     private static final int RECORDER_SAMPLERATE = 44100;
+    private static final int RECORDER_SAMPLESECS = 5;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
-    private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
+    private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_FLOAT;
+
+    // derived constants
+    private static final int RECODER_BUFSIZE = RECORDER_SAMPLERATE * RECORDER_SAMPLESECS;
+
+    // class vars
     private AudioRecord recorder = null;
     private Thread recordingThread = null;
     private boolean isRecording = false;
@@ -46,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         int bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
                 RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
         Log.d("MAXWELL DEBUG", "Min Buffer Size: " + bufferSize);
-        Log.d("MAXWELL DEBUG", "Curr Buffer Size: " + (BufferElements2Rec * BytesPerElement));
+        Log.d("MAXWELL DEBUG", "Curr Buffer Size: " + RECODER_BUFSIZE);
     }
 
     private void setButtonHandlers() {
@@ -63,21 +60,15 @@ public class MainActivity extends AppCompatActivity {
         enableButton(R.id.btnStop, isRecording);
     }
 
-    int BufferElements2Rec = 1024; // want to play 2048 (2K) since 2 bytes we use only 1024
-    int BytesPerElement = 2; // 2 bytes in 16bit format
-
     private void startRecording() {
 
-//        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-//                RECORDER_SAMPLERATE, RECORDER_CHANNELS,
-//                RECORDER_AUDIO_ENCODING, BufferElements2Rec * BytesPerElement);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             recorder = new AudioRecord.Builder()
                     .setAudioSource(MediaRecorder.AudioSource.MIC)
                     .setAudioFormat(new AudioFormat.Builder()
-                        .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
+                        .setEncoding(RECORDER_AUDIO_ENCODING)
                         .setSampleRate(RECORDER_SAMPLERATE)
-                        .setChannelMask(AudioFormat.CHANNEL_IN_MONO)
+                        .setChannelMask(RECORDER_CHANNELS)
                         .build())
                     .build();
         } else {
@@ -99,13 +90,20 @@ public class MainActivity extends AppCompatActivity {
     private void writeAudioDataToFileJK() {
         // Write the output audio in byte
 
-        float sData[] = new float[BufferElements2Rec];
+
+        float sData[] = new float[RECODER_BUFSIZE];
 
         while (isRecording) {
             // gets the voice output from microphone to byte format
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                recorder.read(sData, 0, BufferElements2Rec, AudioRecord.READ_BLOCKING);
+                recorder.read(sData, 0, RECODER_BUFSIZE, AudioRecord.READ_BLOCKING);
+                for (int i = 0; i != sData.length; ++i) {
+                    if (sData[i] != 0) {
+                        Log.d("MAXWELL DEBUG", "sData[: " + i + "] = " + sData[i]);
+                    }
+                }
+                processAubio(RECODER_BUFSIZE/8, RECORDER_SAMPLERATE, sData);
             }
         }
 

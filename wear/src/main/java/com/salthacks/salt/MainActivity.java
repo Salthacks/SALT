@@ -3,8 +3,11 @@ package com.salthacks.salt;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -16,11 +19,25 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataItemBuffer;
+import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.Wearable;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class MainActivity extends WearableActivity {
+public class MainActivity extends WearableActivity implements DataApi.DataListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     private static final SimpleDateFormat AMBIENT_DATE_FORMAT =
             new SimpleDateFormat("HH:mm", Locale.US);
@@ -41,6 +58,8 @@ public class MainActivity extends WearableActivity {
     private long interval;
 
     private boolean salsa;
+
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +104,8 @@ public class MainActivity extends WearableActivity {
         });
         vibrator =  (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
+
+
     }
 
     @Override
@@ -120,6 +141,22 @@ public class MainActivity extends WearableActivity {
     }
 
     private void trackBPM(){
+        PendingResult<DataItemBuffer> results = Wearable.DataApi.getDataItems(mGoogleApiClient);
+        results.setResultCallback(new ResultCallback<DataItemBuffer>() {
+            @Override
+            public void onResult(DataItemBuffer dataItems) {
+                if (dataItems.getCount() != 0) {
+                    DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItems.get(0));
+
+                    // This should read the correct value.
+                    interval = (long)dataMapItem.getDataMap().getDouble("BPM");
+                }
+
+                dataItems.release();
+            }
+        });
+
+        /*
         if(presses < 8) {
             pressTimes[presses] = System.currentTimeMillis();
             ++presses;
@@ -136,6 +173,8 @@ public class MainActivity extends WearableActivity {
             mTextView.setText(Integer.toString(presses));
             mTextView.setTextColor(Color.WHITE);
         }
+        */
+        setVibrateInterval();
     }
     private void calculateAverage(){
         long sum = 0;
@@ -192,4 +231,34 @@ public class MainActivity extends WearableActivity {
         mTextView.setTextColor(Color.WHITE);
         vibrator.cancel();
     }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Wearable.DataApi.addListener(mGoogleApiClient, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onDataChanged(DataEventBuffer dataEvents) {
+        for (DataEvent event : dataEvents) {
+            if (event.getType() == DataEvent.TYPE_CHANGED) {
+                // DataItem changed
+                DataItem item = event.getDataItem();
+                item.getData();
+
+            } else if (event.getType() == DataEvent.TYPE_DELETED) {
+                // DataItem deleted
+            }
+        }
+    }
+
 }
